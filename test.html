@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add People</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    .input-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input-container label {
+      width: 80px;
+      text-align: right;
+    }
+
+    .input-container input {
+      padding: 8px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      flex: 1;
+      max-width: 150px;
+    }
+
+    .price {
+      padding: 8px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      flex: 1;
+      max-width: 150px;
+    }
+
+    /* Add margin between input pairs */
+    br {
+      margin-top: 10px;
+    }
+
+    .disabled {
+      background: #dddddd;
+    }
+  </style>
+</head>
+<body>
+  <button onclick="addInput()">Add People</button>
+  <button onclick="calculate()">Calculate</button>
+  <label>Final price: </label>
+  <input id="finalPrice" type="number" class="price">
+  <div id="inputs" class=""></div>
+  <textarea id="priceReview" hidden></textarea>
+
+  <script>
+    let peoples = []; // Array to store objects
+
+    function addInput() {
+      const inputsDiv = document.getElementById('inputs');
+      const container = document.createElement('div');
+      container.classList.add('input-container');
+
+      const nameLabel = document.createElement('label');
+      nameLabel.textContent = 'Name: ';
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+
+      const priceLabel = document.createElement('label');
+      priceLabel.textContent = 'Price: ';
+      const priceInput = document.createElement('input');
+      priceInput.type = 'number';
+
+      // const discountLabel = document.createElement('label');
+      // discountLabel.textContent = 'Discount price: ';
+      // const discountInput = document.createElement('input');
+      // discountInput.type = 'number';
+      // discountInput.disabled;
+      // discountInput.classList.add('disabled');
+
+      container.appendChild(nameLabel);
+      container.appendChild(nameInput);
+      container.appendChild(priceLabel);
+      container.appendChild(priceInput);
+      inputsDiv.appendChild(container);
+      // container.appendChild(discountLabel);
+      // container.appendChild(discountInput);
+      inputsDiv.appendChild(document.createElement('br'));
+      inputsDiv.appendChild(document.createElement('br'));
+
+      nameInput.addEventListener('input', updateObject);
+      priceInput.addEventListener('input', updateObject);
+    }
+
+    function updateObject() {
+      const inputs = document.querySelectorAll('.input-container');
+      peoples = [];
+
+      inputs.forEach(container => {
+        const name = container.querySelector('input[type="text"]').value;
+        const price = container.querySelector('input[type="number"]').value;
+
+        if (name !== '' && price !== '') {
+          const existingPerson = peoples.find(person => person.name === name);
+
+          if (existingPerson) {
+            existingPerson.price = parseFloat(price);
+          } else {
+            peoples.push({ name, price: parseFloat(price) });
+          }
+        }
+      });
+    }
+
+    function calculate() {
+      const finalPrice = document.getElementById('finalPrice').value;
+      let beforeDiscountPrice = 0;
+      peoples.forEach(people => {
+        beforeDiscountPrice += people.price;
+      })
+      const discountPrice = (beforeDiscountPrice - finalPrice) / peoples.length
+
+      const discountedPeoples = peoples.map(people => {
+        return {
+          ...people,
+          price: people.price - discountPrice, 
+        }
+      })
+      let tempText = '';
+      const priceReviewElement = document.getElementById('priceReview');
+      discountedPeoples.forEach(people => {
+        tempText += `@${people.name}: ${people.price}\n`
+      });
+      priceReviewElement.value = tempText;
+      priceReviewElement.removeAttribute('hidden');
+    }
+  </script>
+</body>
+</html>
